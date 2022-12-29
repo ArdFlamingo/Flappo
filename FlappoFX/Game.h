@@ -21,7 +21,12 @@ class Game
         struct Pipe
         {
             uint16_t x;
-            uint8_t y;
+            uint8_t topPipeY;
+            uint8_t bottomPipeY;
+
+            uint8_t width;
+            uint8_t topPipeHeight;
+            uint8_t bottomPipeHeight;
 
             bool active;
         };
@@ -56,6 +61,8 @@ class Game
 
         uint8_t pipeSpeed;
 
+        uint8_t pipeGap;
+
     public:
 
         void gameLoop();
@@ -68,6 +75,10 @@ class Game
         void preview();
         void game();
 
+        void generatePipe();
+        bool collision();
+
+        void drawSplashscreen();
         void drawTitlescreen();
         void drawPreview();
         void drawGame();
