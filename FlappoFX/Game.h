@@ -74,6 +74,7 @@ class Game
         void titlescreen();
         void preview();
         void game();
+        void gameover();
 
         void generatePipe();
         bool collision();
@@ -82,4 +83,7 @@ class Game
         void drawTitlescreen();
         void drawPreview();
         void drawGame();
+        void drawGameover();
+
+        void printScore();
 };

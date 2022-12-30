@@ -1,14 +1,16 @@
 #include <Arduboy2.h>
 #include "Game.h"
+#include "score.h"
 #include "Sprites.h"
 
-constexpr uint8_t PIPE_ARRAY_SIZE = 2;
-
 Arduboy2 arduboy;
+Score score;
+
 Game::GameState gameState = Game::GameState::Splashscreen;
 Game::Player player;
 Game::Pipe pipe;
 
+    constexpr uint8_t pipeGenerationFrames = 85;
     constexpr uint8_t firstOptionIndex = 0;
     constexpr uint8_t lastOptionIndex = 3;
 
@@ -40,7 +42,7 @@ Game::Pipe pipe;
 
         this->pipeGap = 30;
 
-        for (uint8_t i = 0; i < PIPE_ARRAY_SIZE; i++) {pipes[i].x = -14; pipes[i].width = 14;}
+        for (auto & pipe : pipes) {pipe.x = -14; pipe.width = 14;}
     }
 
     void Game::loop()
@@ -88,6 +90,8 @@ Game::Pipe pipe;
                     break;
 
             case GameState::Gameover:
+                gameover();
+                drawGameover();
                     break;
         }
     }
@@ -136,8 +140,20 @@ Game::Pipe pipe;
 
         if ((player.y - player.radius) <= 0) {player.yVelocity = 0;}
 
+        if (collision()) {pipeSpeed = 0; backgroundSpeed = 0; gameState = GameState::Gameover;}
+
+        for (auto & pipe : pipes)
+        {
+            if ((player.x - player.radius) == (pipe.x + pipe.width))
+                ++score.gameScore;
+        }
+
         generatePipe();
-        collision();
+    }
+
+    void Game::gameover()
+    {
+
     }
 
     void Game::generatePipe()
@@ -147,13 +163,13 @@ Game::Pipe pipe;
             if (pipe.active) {pipe.x -= pipeSpeed;}
             if (pipe.x == -14) {pipe.active = false;}
              
-            if (arduboy.everyXFrames(80))
+            if (arduboy.everyXFrames(pipeGenerationFrames))
             {
                 if (pipe.active)
                     continue;
                         pipe.x = WIDTH;
                         pipe.active = true;
-                        pipe.topPipeHeight = random(10, 31);
+                        pipe.topPipeHeight = random(8, 29);
                     break;
             }
 
@@ -170,6 +186,12 @@ Game::Pipe pipe;
         {
             Rect topPipeHitbox (pipe.x, pipe.topPipeY, pipe.width, pipe.topPipeHeight);
             Rect bottomPipeHitbox (pipe.x, pipe.bottomPipeY, pipe.width, pipe.bottomPipeHeight);
+
+            if (arduboy.collide(playerHitbox, topPipeHitbox) || arduboy.collide(playerHitbox, bottomPipeHitbox))
+            {
+                return true;
+            }
+
         }
 
         return false;
@@ -203,21 +225,33 @@ Game::Pipe pipe;
     {
         arduboy.fillCircle(player.x, player.y, player.radius, WHITE); 
 
-        if (this->backgroundAx > -128 && gameState == GameState::Game) {backgroundAx -= backgroundSpeed;}
+        if (this->backgroundAx > -128) {backgroundAx -= backgroundSpeed;}
             else {backgroundAx = 128;}
-        if (this->backgroundBx > -128 && gameState == GameState::Game) {backgroundBx -= backgroundSpeed;}  
+        if (this->backgroundBx > -128) {backgroundBx -= backgroundSpeed;}  
             else {backgroundBx = 128;} 
 
         Sprites::drawSelfMasked(backgroundAx, 32, background, 0);
         Sprites::drawSelfMasked(backgroundBx, 32, background, 0);
 
-        //for (auto & pipe : pipes) {arduboy.fillRect(pipe.x, pipe.topPipeY, pipe.width, pipe.topPipeHeight); arduboy.fillRect(pipe.x, pipe.bottomPipeY, pipe.width, pipe.bottomPipeHeight);}
-        arduboy.fillRect(pipes[0].x, pipes[0].topPipeY, pipes[0].width, pipes[0].topPipeHeight); 
-        arduboy.fillRect(pipes[0].x, pipes[0].bottomPipeY, pipes[0].width, pipes[0].bottomPipeHeight);
+        for (auto & pipe : pipes) 
+        {
+            arduboy.fillRect(pipe.x, pipe.topPipeY, pipe.width, pipe.topPipeHeight); 
+            arduboy.fillRect(pipe.x, pipe.bottomPipeY, pipe.width, pipe.bottomPipeHeight);
+        }
 
-        arduboy.setCursor(0, 0);
-        arduboy.println(pipes[0].x);
-        arduboy.println(pipes[1].x);
+        score.printScore();
     }
+
+    void Game::drawGameover()
+    {
+        drawGame();
+    }
+
+    void Score::printScore()
+    {
+        arduboy.setTextSize(2);
+        arduboy.setCursor(this->calculateScoreX(this->gameScore), 0);
+        arduboy.print(this->gameScore);
+    }   
 
 
