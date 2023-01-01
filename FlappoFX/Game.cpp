@@ -1,14 +1,19 @@
 #include <Arduboy2.h>
 #include "Game.h"
-#include "score.h"
+#include "Score.h"
+#include "Particles.h"
 #include "Sprites.h"
 
 Arduboy2 arduboy;
+
 Score score;
 
 Game::GameState gameState = Game::GameState::Splashscreen;
 Game::Player player;
 Game::Pipe pipe;
+
+Particles gameParticles;
+Particles::Particle gameParticle;
 
     constexpr uint8_t pipeGenerationFrames = 85;
     constexpr uint8_t firstOptionIndex = 0;
@@ -19,28 +24,33 @@ Game::Pipe pipe;
     void Game::setup()
     {
         arduboy.begin();
-        arduboy.initRandomSeed();
+        gameParticles.setup();
         initialize();
-    }
+        gameParticle.initialize();
+    } 
 
     void Game::initialize()
     {
-        this->currentTime = millis();
+        currentTime = millis();
         player.x = 59;
         player.y = 27;
 
-        this->backgroundAx = 0;
-        this->backgroundBx = 128;
+        backgroundAx = 0;
+        backgroundBx = 128;
 
-        this->backgroundSpeed = 0.1;
+        backgroundSpeed = 0.1;
 
         player.gravity = 0.05;
 
         player.jumpVelocity = 1.2;
 
-        this->pipeSpeed = 1;
+        pipeSpeed = 1;
 
-        this->pipeGap = 30;
+        pipeGap = 30;
+
+        pipeColor = 1;
+
+        drawPlayerDeath = true;
 
         for (auto & pipe : pipes) {pipe.x = -14; pipe.width = 14;}
     }
@@ -52,21 +62,28 @@ Game::Pipe pipe;
 
         arduboy.pollButtons();
         arduboy.clear();
-        gameLoop();
+        updateGame();
+        score.loop();
+        
+        for (auto & particleSet : gameParticles.particleArray)
+        {
+            particleSet.update();
+        }
+
         arduboy.display();
     }
 
-    void Game::gameLoop()
+    void Game::updateGame()
     {
         switch (gameState)
         {
             case GameState::Splashscreen:
-                splashscreen();
+                updateSplashscreen();
                 drawSplashscreen();
                     break;
 
             case GameState::Title:
-                titlescreen();
+                updateTitlescreen();
                 drawTitlescreen();
                     break;
 
@@ -80,54 +97,60 @@ Game::Pipe pipe;
                     break;
 
             case GameState::Preview:
-                preview();
+                updatePreview();
                 drawPreview();
                     break;
 
             case GameState::Game:
-                game();
+                updateGameplay();
                 drawGame();
+                drawPlayer();
+                    break;
+
+            case GameState::Death:
+                updateDeath();
+                drawDeath();
                     break;
 
             case GameState::Gameover:
-                gameover();
+                updateGameover();
                 drawGameover();
                     break;
         }
     }
 
-    void Game::splashscreen()
+    void Game::updateSplashscreen()
     {
-        this->millisecondTarget = millis();
-        this->millisecondTarget -= this->currentTime;
+        millisecondTargetSplashscreen = millis();
+        millisecondTargetSplashscreen -= currentTime;
 
-        if (millisecondTarget >= 3000) {gameState = GameState::Title;}
+        if (millisecondTargetSplashscreen >= 3000) {gameState = GameState::Title;}
     }
 
-    void Game::titlescreen()
+    void Game::updateTitlescreen()
     {
         if (arduboy.justPressed(DOWN_BUTTON))
         {
-            if (this->cursorIndex < lastOptionIndex) {++this->cursorIndex;}
+            if (cursorIndex < lastOptionIndex) {++cursorIndex;}
         }
 
         if (arduboy.justPressed(UP_BUTTON))
         {
-            if (this->cursorIndex > firstOptionIndex) {--this->cursorIndex;}  
+            if (cursorIndex > firstOptionIndex) {--cursorIndex;}  
         }
 
-        this->cursorX = options[this->cursorIndex].x;
-        this->cursorY = options[this->cursorIndex].y;
+        cursorX = options[cursorIndex].x;
+        cursorY = options[cursorIndex].y;
 
         if (arduboy.justPressed(A_BUTTON) && cursorIndex == 0) {gameState = GameState::Preview;}
     }
 
-    void Game::preview()
+    void Game::updatePreview()
     {
         if (arduboy.justPressed(UP_BUTTON) || arduboy.justPressed(DOWN_BUTTON) || arduboy.justPressed(LEFT_BUTTON) || arduboy.justPressed(RIGHT_BUTTON) || arduboy.justPressed (A_BUTTON) || arduboy.justPressed(B_BUTTON)) {gameState = GameState::Game;}
     }
 
-    void Game::game()
+    void Game::updateGameplay()
     {
         player.yVelocity += player.gravity;
         player.y += player.yVelocity;
@@ -139,8 +162,13 @@ Game::Pipe pipe;
         }
 
         if ((player.y - player.radius) <= 0) {player.yVelocity = 0;}
+        if ((player.y + player.radius) >= 63) {player.yVelocity = 0; gameState = GameState::Death;}
 
-        if (collision()) {pipeSpeed = 0; backgroundSpeed = 0; gameState = GameState::Gameover;}
+        if (collision()) 
+        {
+            pipeSpeed = 0; backgroundSpeed = 0; 
+            gameState = GameState::Death;
+        }
 
         for (auto & pipe : pipes)
         {
@@ -149,11 +177,6 @@ Game::Pipe pipe;
         }
 
         generatePipe();
-    }
-
-    void Game::gameover()
-    {
-
     }
 
     void Game::generatePipe()
@@ -169,7 +192,7 @@ Game::Pipe pipe;
                     continue;
                         pipe.x = WIDTH;
                         pipe.active = true;
-                        pipe.topPipeHeight = random(8, 29);
+                        pipe.topPipeHeight = random(6, 29);
                     break;
             }
 
@@ -180,7 +203,7 @@ Game::Pipe pipe;
 
     bool Game::collision()
     {
-        Rect playerHitbox (player.x, player.y, (player.radius - 1), (player.radius - 1));
+        Rect playerHitbox (player.x, player.y, player.radius, player.radius);
         
         for (auto & pipe : pipes)
         {
@@ -191,10 +214,51 @@ Game::Pipe pipe;
             {
                 return true;
             }
-
         }
 
         return false;
+    }
+
+    void Game::updateDeath()
+    {
+        bool gameover;
+
+            if (!gameover)
+            {
+                if (arduboy.everyXFrames(180))
+                {
+                    gameover = true;
+                    gameState = GameState::Gameover;
+                }
+            }
+
+            if (arduboy.everyXFrames(28))
+            {
+                if (pipeColor == 1)
+                {
+                    pipeColor = 0;
+                }
+                else
+                {
+                    pipeColor = 1;
+                }
+            }
+
+            arduboy.setCursor(0, 0);
+            arduboy.print(gameover);
+    }
+
+    void Game::updateGameover()
+    {
+        if (drawPlayerDeath)
+        {
+            if (arduboy.everyXFrames(30))
+            {
+                drawPlayerDeath = false;
+            }
+
+            drawPlayer();
+        }
     }
 
     void Game::drawSplashscreen()
@@ -206,9 +270,6 @@ Game::Pipe pipe;
     {
         Sprites::drawOverwrite(0, 0, title, 0);
         Sprites::drawOverwrite(cursorX, cursorY, cursor, 0);
-
-        arduboy.setCursor(0, 0);
-        arduboy.print(cursorIndex);
     }
 
     void Game::drawPreview() 
@@ -223,33 +284,49 @@ Game::Pipe pipe;
 
     void Game::drawGame()
     {
-        arduboy.fillCircle(player.x, player.y, player.radius, WHITE); 
+            if (backgroundAx > -128) {backgroundAx -= backgroundSpeed;}
+                else {backgroundAx = 128;}
+            if (backgroundBx > -128) {backgroundBx -= backgroundSpeed;}  
+                else {backgroundBx = 128;} 
 
-        if (this->backgroundAx > -128) {backgroundAx -= backgroundSpeed;}
-            else {backgroundAx = 128;}
-        if (this->backgroundBx > -128) {backgroundBx -= backgroundSpeed;}  
-            else {backgroundBx = 128;} 
-
-        Sprites::drawSelfMasked(backgroundAx, 32, background, 0);
-        Sprites::drawSelfMasked(backgroundBx, 32, background, 0);
+        if (gameState == GameState::Game)
+        {
+            Sprites::drawSelfMasked(backgroundAx, 32, background, 0);
+            Sprites::drawSelfMasked(backgroundBx, 32, background, 0);
+        }
 
         for (auto & pipe : pipes) 
         {
-            arduboy.fillRect(pipe.x, pipe.topPipeY, pipe.width, pipe.topPipeHeight); 
-            arduboy.fillRect(pipe.x, pipe.bottomPipeY, pipe.width, pipe.bottomPipeHeight);
+            arduboy.fillRect(pipe.x, pipe.topPipeY, pipe.width, pipe.topPipeHeight, pipeColor); 
+            arduboy.fillRect(pipe.x, pipe.bottomPipeY, pipe.width, pipe.bottomPipeHeight, pipeColor);
         }
 
         score.printScore();
     }
 
-    void Game::drawGameover()
+    void Game::drawPlayer()
+    {
+        arduboy.fillCircle(player.x, player.y, player.radius, WHITE); 
+    }
+
+    void Game::drawDeath()
     {
         drawGame();
+
+        if (drawPlayerDeath) {drawPlayer();}
+    }
+
+    void Game::drawGameover()
+    {
+        if (!drawPlayerDeath)
+        {
+            gameParticle.update();
+        }
     }
 
     void Score::printScore()
     {
-        arduboy.setTextSize(2);
+        arduboy.setTextSize(1);
         arduboy.setCursor(this->calculateScoreX(this->gameScore), 0);
         arduboy.print(this->gameScore);
     }   

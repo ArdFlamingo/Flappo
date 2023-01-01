@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 
 class Game
 {
@@ -42,6 +43,7 @@ class Game
             Options,
             Preview,
             Game,
+            Death,
             Gameover,
         };
 
@@ -52,7 +54,9 @@ class Game
         uint8_t cursorY;
 
         unsigned long currentTime;
-        unsigned long millisecondTarget;
+
+        unsigned long millisecondTargetSplashscreen;
+        unsigned long millisecondTargetGameover;
 
         float backgroundAx;
         float backgroundBx;
@@ -63,18 +67,23 @@ class Game
 
         uint8_t pipeGap;
 
+        bool drawPlayerDeath;
+        
+        uint8_t pipeColor;
+
     public:
 
-        void gameLoop();
+        void updateGame();
         void setup();
         void loop();
         void initialize();
 
-        void splashscreen();  
-        void titlescreen();
-        void preview();
-        void game();
-        void gameover();
+        void updateSplashscreen();  
+        void updateTitlescreen();
+        void updatePreview();
+        void updateGameplay();
+        void updateDeath();
+        void updateGameover();
 
         void generatePipe();
         bool collision();
@@ -83,7 +92,15 @@ class Game
         void drawTitlescreen();
         void drawPreview();
         void drawGame();
+        void drawPlayer();
+        void drawDeath();
         void drawGameover();
 
         void printScore();
+
+    public:
+
+        Game::GameState gameState = Game::GameState::Splashscreen;
+        Game::Player player;
+        Game::Pipe pipe;
 };

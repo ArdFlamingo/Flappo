@@ -1,15 +1,24 @@
 #include <Arduboy2.h>
 #include "Score.h"
 
-uint8_t Score::countScoreDigits(uint8_t value)
+void Score::loop()
 {
-    if (value > 100)
+    countScoreDigits(0);
+    calculateScoreStringWidth(0);
+    calculateCenterX(0);
+    calculateScoreX(0);
+}
+
+uint8_t Score::countScoreDigits(uint16_t value)
+{
+    if (value > 999)
         return 3;
 
-    if (value > 10)
+    if (value > 99)
         return 2;
 
-    return 1;
+    else
+        return 1;
 }
 
 uint8_t Score::calculateScoreStringWidth(uint8_t length)
