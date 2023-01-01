@@ -6,7 +6,7 @@ class Particles
 {
     private:
 
-        float gravity = 0.1;
+        float gravity = 0.05;
 
     public:
 
@@ -37,6 +37,7 @@ class Particles
                 float getXVelocity()                    { return this->xVelocity; }
                 float getYVelocity()                    { return this->yVelocity; }
                 float getSize()                         { return this->size; }
+                uint8_t getThrust()                     { return this->thrust; }
                 uint8_t getCounter()                    { return this->counter; }
                 uint8_t getDirection()                  { return this->direction; }
 
@@ -53,6 +54,6 @@ class Particles
                 void update();
                 bool render();
         };
-
-        Particle particleArray[10];    
+        
+        Particle particleArray[5]; 
 };

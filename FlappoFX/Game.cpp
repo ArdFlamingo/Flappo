@@ -13,7 +13,7 @@ Game::Player player;
 Game::Pipe pipe;
 
 Particles gameParticles;
-Particles::Particle gameParticle;
+Particles::Particle gameParticle;  
 
     constexpr uint8_t pipeGenerationFrames = 85;
     constexpr uint8_t firstOptionIndex = 0;
@@ -24,9 +24,8 @@ Particles::Particle gameParticle;
     void Game::setup()
     {
         arduboy.begin();
-        gameParticles.setup();
         initialize();
-        gameParticle.initialize();
+        gameParticles.setup();
     } 
 
     void Game::initialize()
@@ -48,9 +47,7 @@ Particles::Particle gameParticle;
 
         pipeGap = 30;
 
-        pipeColor = 1;
-
-        drawPlayerDeath = true;
+        drawPlayerGameover = true;
 
         for (auto & pipe : pipes) {pipe.x = -14; pipe.width = 14;}
     }
@@ -64,12 +61,6 @@ Particles::Particle gameParticle;
         arduboy.clear();
         updateGame();
         score.loop();
-        
-        for (auto & particleSet : gameParticles.particleArray)
-        {
-            particleSet.update();
-        }
-
         arduboy.display();
     }
 
@@ -105,11 +96,6 @@ Particles::Particle gameParticle;
                 updateGameplay();
                 drawGame();
                 drawPlayer();
-                    break;
-
-            case GameState::Death:
-                updateDeath();
-                drawDeath();
                     break;
 
             case GameState::Gameover:
@@ -162,12 +148,12 @@ Particles::Particle gameParticle;
         }
 
         if ((player.y - player.radius) <= 0) {player.yVelocity = 0;}
-        if ((player.y + player.radius) >= 63) {player.yVelocity = 0; gameState = GameState::Death;}
+        if ((player.y + player.radius) >= 63) {player.yVelocity = 0; gameState = GameState::Gameover;}
 
         if (collision()) 
         {
             pipeSpeed = 0; backgroundSpeed = 0; 
-            gameState = GameState::Death;
+            gameState = GameState::Gameover;
         }
 
         for (auto & pipe : pipes)
@@ -219,42 +205,13 @@ Particles::Particle gameParticle;
         return false;
     }
 
-    void Game::updateDeath()
-    {
-        bool gameover;
-
-            if (!gameover)
-            {
-                if (arduboy.everyXFrames(180))
-                {
-                    gameover = true;
-                    gameState = GameState::Gameover;
-                }
-            }
-
-            if (arduboy.everyXFrames(28))
-            {
-                if (pipeColor == 1)
-                {
-                    pipeColor = 0;
-                }
-                else
-                {
-                    pipeColor = 1;
-                }
-            }
-
-            arduboy.setCursor(0, 0);
-            arduboy.print(gameover);
-    }
-
     void Game::updateGameover()
     {
-        if (drawPlayerDeath)
+        if (drawPlayerGameover)
         {
-            if (arduboy.everyXFrames(30))
+            if (arduboy.everyXFrames(60))
             {
-                drawPlayerDeath = false;
+                drawPlayerGameover = false;
             }
 
             drawPlayer();
@@ -297,8 +254,8 @@ Particles::Particle gameParticle;
 
         for (auto & pipe : pipes) 
         {
-            arduboy.fillRect(pipe.x, pipe.topPipeY, pipe.width, pipe.topPipeHeight, pipeColor); 
-            arduboy.fillRect(pipe.x, pipe.bottomPipeY, pipe.width, pipe.bottomPipeHeight, pipeColor);
+            arduboy.fillRect(pipe.x, pipe.topPipeY, pipe.width, pipe.topPipeHeight); 
+            arduboy.fillRect(pipe.x, pipe.bottomPipeY, pipe.width, pipe.bottomPipeHeight);
         }
 
         score.printScore();
@@ -309,19 +266,25 @@ Particles::Particle gameParticle;
         arduboy.fillCircle(player.x, player.y, player.radius, WHITE); 
     }
 
-    void Game::drawDeath()
-    {
-        drawGame();
-
-        if (drawPlayerDeath) {drawPlayer();}
-    }
-
     void Game::drawGameover()
     {
-        if (!drawPlayerDeath)
+        if (!drawPlayerGameover)
         {
-            gameParticle.update();
+            for (uint8_t i = 0; i < 5; i++)
+            { 
+                gameParticle.initialize();
+                gameParticle.update();
+
+                if (gameParticle.render())
+                {
+                    Arduboy2::drawRect(gameParticle.getX(), gameParticle.getY(), gameParticle.getSize(), gameParticle.getSize());
+                }
+            }
         }
+
+        arduboy.setCursor(0, 0);
+        arduboy.println(gameParticle.getSize());
+        arduboy.print(player.x);
     }
 
     void Score::printScore()

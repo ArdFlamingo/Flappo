@@ -43,8 +43,7 @@ class Game
             Options,
             Preview,
             Game,
-            Death,
-            Gameover,
+            Gameover
         };
 
     private:
@@ -56,7 +55,6 @@ class Game
         unsigned long currentTime;
 
         unsigned long millisecondTargetSplashscreen;
-        unsigned long millisecondTargetGameover;
 
         float backgroundAx;
         float backgroundBx;
@@ -67,9 +65,7 @@ class Game
 
         uint8_t pipeGap;
 
-        bool drawPlayerDeath;
-        
-        uint8_t pipeColor;
+        bool drawPlayerGameover;
 
     public:
 
@@ -82,7 +78,6 @@ class Game
         void updateTitlescreen();
         void updatePreview();
         void updateGameplay();
-        void updateDeath();
         void updateGameover();
 
         void generatePipe();
@@ -93,7 +88,6 @@ class Game
         void drawPreview();
         void drawGame();
         void drawPlayer();
-        void drawDeath();
         void drawGameover();
 
         void printScore();
