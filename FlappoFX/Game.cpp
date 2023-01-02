@@ -270,15 +270,12 @@ Particles::Particle gameParticle;
     {
         if (!drawPlayerGameover)
         {
-            for (uint8_t i = 0; i < 5; i++)
-            { 
-                gameParticle.initialize();
-                gameParticle.update();
+            gameParticle.initialize();
+            gameParticle.update();
 
-                if (gameParticle.render())
-                {
-                    Arduboy2::drawRect(gameParticle.getX(), gameParticle.getY(), gameParticle.getSize(), gameParticle.getSize());
-                }
+            if (gameParticle.render())
+            {
+                arduboy.fillRect(gameParticle.getX(), gameParticle.getY(), gameParticle.getSize(), gameParticle.getSize());
             }
         }
 
