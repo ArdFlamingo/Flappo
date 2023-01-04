@@ -1,8 +1,6 @@
 #include <Arduboy2.h>
 #include "Score.h"
 
-Score::Highscore highscore;
-
 void Score::loop()
 {
     countScoreDigits(0);

@@ -8,7 +8,7 @@
 Arduboy2 arduboy;
 
 Score score;
-Score::Highscore gameHighscore;
+Score::Highscore highscore;
 
 Game::GameState gameState = Game::GameState::Splashscreen;
 Game::Player player;
@@ -246,7 +246,7 @@ Particles particles;
                 gameState = GameState::Gameover;
         }
 
-        for (auto & highscore : gameHighscore.highscoreList)
+        for (auto & highscore : highscore.highscoreList)
         {
             arduboy.println(highscore);
         }
@@ -337,7 +337,7 @@ Particles particles;
 
         arduboy.setTextSize(1);
 
-        if (score.gameScore > gameHighscore.highscoreList[0])
+        if (score.gameScore > highscore.highscoreList[0])
         {
             arduboy.setCursor(6, 30);
             arduboy.print(F("Spectacular Job Bro!"));
@@ -360,27 +360,21 @@ Particles particles;
 
     void Score::updateHighscore()
     {
-        if (score.gameScore > gameHighscore.highscoreList[3])
+        if (score.gameScore > highscore.highscoreList[0])
         {
-            gameHighscore.highscoreList[3] = score.gameScore;
+            highscore.highscoreList[0] = gameScore;
         }
-
-        else if (gameHighscore.highscoreList[3] > gameHighscore.highscoreList[2])
+        else if (score.gameScore > highscore.highscoreList[1])
         {
-            gameHighscore.highscoreList[2] = gameHighscore.highscoreList[3];
-            gameHighscore.highscoreList[3] = 0;
+            highscore.highscoreList[1] = gameScore;
         }
-
-        else if (gameHighscore.highscoreList[2] > gameHighscore.highscoreList[1])
+        else if (score.gameScore > highscore.highscoreList[2])
         {
-            gameHighscore.highscoreList[1] = gameHighscore.highscoreList[2];
-            gameHighscore.highscoreList[2] = 0;
+            highscore.highscoreList[2] = gameScore;
         }
-
-        else if (gameHighscore.highscoreList[1] > gameHighscore.highscoreList[0])
+        else if (score.gameScore > highscore.highscoreList[3])
         {
-            gameHighscore.highscoreList[0] = gameHighscore.highscoreList[1];
-            gameHighscore.highscoreList[1] = 0;
+            highscore.highscoreList[3] = gameScore;
         }
     } 
 
