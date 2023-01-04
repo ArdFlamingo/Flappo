@@ -1,59 +1,42 @@
 #pragma once
 
 #include <stdint.h>
+#include "Game.h"
+
 
 class Particles
 {
-    private:
+    public:
 
-        float gravity = 0.05;
+        struct Particle
+        {
+            public:
+
+                float x;
+                float y;
+
+                float xVelocity;
+                float yVelocity;
+
+                float xForce;
+                float yForce;
+
+                uint8_t size = 1;
+
+                uint8_t counter = 180;
+        };
 
     public:
 
-        void setup();
+        float gravity = 0.022;
 
-        struct Particle    //this code is a modified example by @filmote from this thread: https://community.arduboy.com/t/how-to-get-started-with-particles/9190/3
-        {
-            private:
+        float playerX;
+        float playerY;
 
-                float x;
-                float xVelocity;
-                float xForce;
+        void resetParticles();
+        void updateParticles();
 
-                float y;
-                float yVelocity;
+    public:
 
-                float thrust;
-
-                uint8_t size;
-        
-                uint8_t counter;
-                uint8_t direction;    //if 0, direction will be right. if 1, direction will be left
-
-            public:
-
-                float getX()                            { return this->x; }
-                float getY()                            { return this->y; } 
-                float getXVelocity()                    { return this->xVelocity; }
-                float getYVelocity()                    { return this->yVelocity; }
-                float getSize()                         { return this->size; }
-                uint8_t getThrust()                     { return this->thrust; }
-                uint8_t getCounter()                    { return this->counter; }
-                uint8_t getDirection()                  { return this->direction; }
-
-                void setX(float value)                  { this->x = value; }
-                void setY(float value)                  { this->y = value; }
-                void setXVelocity(float value)          { this->xVelocity = value; }
-                void setYVelocity(float value)          { this->yVelocity = value; }
-                void setCounter(uint8_t value)          { this->counter = value; }
-                void setDirection(uint8_t value)        { this->direction = value; }
-
-            public:
-        
-                void initialize();
-                void update();
-                bool render();
-        };
-        
-        Particle particleArray[5]; 
+        Particle particleArray[20];
 };

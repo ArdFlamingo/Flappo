@@ -91,10 +91,4 @@ class Game
         void drawGameover();
 
         void printScore();
-
-    public:
-
-        Game::GameState gameState = Game::GameState::Splashscreen;
-        Game::Player player;
-        Game::Pipe pipe;
 };

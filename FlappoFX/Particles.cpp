@@ -1,53 +1,42 @@
-#include "Particles.h"
-#include "Game.h"
 #include <Arduboy2.h>
+#include "Particles.h"
 
-Particles particles;
-Particles::Particle particle;
+Game::Player gamePlayer;
 
-Game::Player particlePlayer;
 
-void Particles::setup()
+void Particles::updateParticles()
 {
-    Arduboy2::initRandomSeed();
-}
-
-void Particles::Particle::initialize()
-{
-        particle.size = random (1, 4);
-        particle.direction = random(0, 2);
-        particle.x = random (particlePlayer.x - particlePlayer.radius, particlePlayer.x + (particlePlayer.radius + 1));
-        particle.xForce = random (0.1, 0.3);
-        particle.y = random (particlePlayer.y - particlePlayer.radius, particlePlayer.y + (particlePlayer.radius + 1));
-        particle.thrust = random (0.1, 0.5);
-        particle.counter = random (180, 241);
-}
-
-void Particles::Particle::update()
-{ 
-        particle.yVelocity += particles.gravity * particle.size;
-        particle.yVelocity -= particle.thrust / particle.size;
+    for (auto & particles : particleArray)
+    {
+        particles.yVelocity += this->gravity * particles.size;
         
-        if (particle.direction == 0)
-        {
-            particle.xVelocity += particle.xForce;
-        }
+        particles.yVelocity -= particles.yForce / (particles.size * 0.5);
+        particles.xVelocity += particles.xForce / (particles.size * 0.15);
 
-        if (particle.direction == 1)
-        {
-            particle.xVelocity += -particle.xForce;
-        }
+        particles.xForce *= 0.95;
+        particles.yForce *= 0.95;
 
-        particle.x += particle.xVelocity;
-        particle.y += particle.yVelocity;
+        particles.x += particles.xVelocity;
+        particles.y += particles.yVelocity;
 
-        if (particle.counter > 0) 
+        if (particles.counter > 0)
         {
-            particle.counter--;
+            particles.counter--;
+            Arduboy2::drawRect(particles.x, particles.y, particles.size, particles.size);
         }
+    }
 }
 
-bool Particles::Particle::render()
+void Particles::resetParticles()
 {
-    return (this->counter > 0);
+    for (auto & particles : particleArray)
+    {
+        particles.size = random(2, 7);
+
+        particles.x = random(playerX - 5, playerX + 5 + 1);
+        particles.y = random(playerY - 5, playerY + 5 + 1);
+
+        particles.xForce = random(-5, 6) / 100.0;
+        particles.yForce = random(25, 50) / 100.0;
+    }
 }

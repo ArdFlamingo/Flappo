@@ -12,9 +12,12 @@ void Score::loop()
 uint8_t Score::countScoreDigits(uint16_t value)
 {
     if (value > 999)
+        return 4;
+
+    else if (value > 99)
         return 3;
 
-    if (value > 99)
+    else if (value > 9)
         return 2;
 
     else
