@@ -38,5 +38,5 @@ class Particles
 
     public:
 
-        Particle particleArray[20];
+        Particle particleArray[40];
 };

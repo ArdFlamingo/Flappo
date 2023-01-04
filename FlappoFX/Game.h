@@ -43,6 +43,7 @@ class Game
             Options,
             Preview,
             Game,
+            Death,
             Gameover
         };
 
@@ -81,6 +82,7 @@ class Game
         void updateTitlescreen();
         void updatePreview();
         void updateGameplay();
+        void updateDeath();
         void updateGameover();
 
         void generatePipe();

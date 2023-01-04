@@ -14,11 +14,12 @@ class Score     //this code is a modified example from @pharap from this thread:
 
         void printScore();
         void loop();
+        void updateHighscore();
 
     public:
 
         struct Highscore
         {
-            uint16_t highscore[4];
+            uint16_t highscoreList[4];
         };
 };

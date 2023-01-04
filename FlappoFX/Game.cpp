@@ -99,6 +99,10 @@ Particles particles;
                 drawPlayer();
                     break;
 
+            case GameState::Death:
+                updateDeath();
+                    break;
+
             case GameState::Gameover:
                 updateGameover();
                 drawGameover();
@@ -129,7 +133,11 @@ Particles particles;
         cursorX = options[cursorIndex].x;
         cursorY = options[cursorIndex].y;
 
-        if (arduboy.justPressed(A_BUTTON) && cursorIndex == 0) {gameState = GameState::Preview;}
+        if (arduboy.justPressed(A_BUTTON) && cursorIndex == 0) 
+        {
+            gameState = GameState::Preview;
+            resetGame();
+        }
     }
 
     void Game::updatePreview()
@@ -153,7 +161,7 @@ Particles particles;
         if (collision()) 
         {
             pipeSpeed = 0; backgroundSpeed = 0; 
-            gameState = GameState::Gameover;
+            gameState = GameState::Death;
             particles.playerX = player.x;
             particles.playerY = player.y;
             particles.resetParticles();
@@ -214,7 +222,7 @@ Particles particles;
         return false;
     }
 
-    void Game::updateGameover()
+    void Game::updateDeath()
     {
         if (drawPlayerGameover)
         {
@@ -232,14 +240,15 @@ Particles particles;
 
         for (auto & particles : particles.particleArray)
         {
-            if (particles.counter == 0)
-            {
-                if (arduboy.justPressed(A_BUTTON))
-                {
-                    gameState = GameState::Title;
-                    resetGame();
-                }
-            }            
+            if (particles.counter > 0)
+                break;
+                    
+                gameState = GameState::Gameover;
+        }
+
+        for (auto & highscore : gameHighscore.highscoreList)
+        {
+            arduboy.println(highscore);
         }
     }
 
@@ -259,9 +268,17 @@ Particles particles;
 
         drawPlayerGameover = true;
 
-        for (auto & pipe : pipes) {pipe.x = -14; pipe.width = 14;}
+        for (auto & pipe : pipes) {pipe.x = -14; pipe.width = 14; pipe.active = false;}
 
         score.gameScore = 0;
+
+        for (auto & particles : particles.particleArray) {particles.xVelocity = 0; particles.yVelocity = 0;}
+    }
+
+    void Game::updateGameover()
+    {
+        if (arduboy.justPressed(A_BUTTON))
+            gameState = GameState::Title;
     }
 
     void Game::drawSplashscreen()
@@ -314,29 +331,23 @@ Particles particles;
 
     void Game::drawGameover()
     {
-        for (auto & particles : particles.particleArray)
+        arduboy.setTextSize(2);
+        arduboy.setCursor(10, 3);
+        arduboy.print(F("GAME OVER"));
+
+        arduboy.setTextSize(1);
+
+        if (score.gameScore > gameHighscore.highscoreList[0])
         {
-            if (particles.counter > 0)
-                break;
-
-            arduboy.setTextSize(2);
-            arduboy.setCursor(10, 3);
-            arduboy.print(F("GAME OVER"));
-
-            arduboy.setTextSize(1);
-
-            if (score.gameScore > gameHighscore.highscore[0])
-            {
-                arduboy.setCursor(6, 30);
-                arduboy.print(F("Spectacular Job Bro!"));
-            }
-            else
-            {
-                arduboy.setCursor(18, 30);
-                arduboy.println(F("Better Luck Next"));
-                arduboy.setCursorX(35);
-                arduboy.print("Time Dude!");
-            }
+            arduboy.setCursor(6, 30);
+            arduboy.print(F("Spectacular Job Bro!"));
+        }
+        else
+        {
+            arduboy.setCursor(18, 30);
+            arduboy.println(F("Better Luck Next"));
+            arduboy.setCursorX(35);
+            arduboy.print("Time Dude!");
         }
     }
 
@@ -345,6 +356,32 @@ Particles particles;
         arduboy.setTextSize(1);
         arduboy.setCursor(this->calculateScoreX(this->gameScore), 0);
         arduboy.print(this->gameScore);
-    }   
+    }  
+
+    void Score::updateHighscore()
+    {
+        if (score.gameScore > gameHighscore.highscoreList[3])
+        {
+            gameHighscore.highscoreList[3] = score.gameScore;
+        }
+
+        else if (gameHighscore.highscoreList[3] > gameHighscore.highscoreList[2])
+        {
+            gameHighscore.highscoreList[2] = gameHighscore.highscoreList[3];
+            gameHighscore.highscoreList[3] = 0;
+        }
+
+        else if (gameHighscore.highscoreList[2] > gameHighscore.highscoreList[1])
+        {
+            gameHighscore.highscoreList[1] = gameHighscore.highscoreList[2];
+            gameHighscore.highscoreList[2] = 0;
+        }
+
+        else if (gameHighscore.highscoreList[1] > gameHighscore.highscoreList[0])
+        {
+            gameHighscore.highscoreList[0] = gameHighscore.highscoreList[1];
+            gameHighscore.highscoreList[1] = 0;
+        }
+    } 
 
 
