@@ -32,6 +32,7 @@ void Particles::resetParticles()
     for (auto & particles : particleArray)
     {
         particles.size = random(2, 7);
+        particles.counter = random(85, 120);
 
         particles.x = random(playerX - 5, playerX + 5 + 1);
         particles.y = random(playerY - 5, playerY + 5 + 1);

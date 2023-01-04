@@ -8,6 +8,7 @@
 Arduboy2 arduboy;
 
 Score score;
+Score::Highscore gameHighscore;
 
 Game::GameState gameState = Game::GameState::Splashscreen;
 Game::Player player;
@@ -162,6 +163,12 @@ Particles particles;
         {
             if ((player.x - player.radius) == (pipe.x + pipe.width))
                 ++score.gameScore;
+
+            if (score.gameScore == (pipeDecreaseThreshold + 5) && pipeGap > 14)
+            {
+                pipeGap--;
+                pipeDecreaseThreshold = score.gameScore;
+            }
         }
 
         generatePipe();
@@ -222,6 +229,39 @@ Particles particles;
         {   
             particles.updateParticles();
         }
+
+        for (auto & particles : particles.particleArray)
+        {
+            if (particles.counter == 0)
+            {
+                if (arduboy.justPressed(A_BUTTON))
+                {
+                    gameState = GameState::Title;
+                    resetGame();
+                }
+            }            
+        }
+    }
+
+    void Game::resetGame()
+    {
+        player.y = 27;
+        player.yVelocity = 0;
+
+        backgroundAx = 0;
+        backgroundBx = 128;
+
+        backgroundSpeed = 0.1;
+
+        pipeSpeed = 1;
+
+        pipeGap = 25;
+
+        drawPlayerGameover = true;
+
+        for (auto & pipe : pipes) {pipe.x = -14; pipe.width = 14;}
+
+        score.gameScore = 0;
     }
 
     void Game::drawSplashscreen()
@@ -274,7 +314,30 @@ Particles particles;
 
     void Game::drawGameover()
     {
-        
+        for (auto & particles : particles.particleArray)
+        {
+            if (particles.counter > 0)
+                break;
+
+            arduboy.setTextSize(2);
+            arduboy.setCursor(10, 3);
+            arduboy.print(F("GAME OVER"));
+
+            arduboy.setTextSize(1);
+
+            if (score.gameScore > gameHighscore.highscore[0])
+            {
+                arduboy.setCursor(6, 30);
+                arduboy.print(F("Spectacular Job Bro!"));
+            }
+            else
+            {
+                arduboy.setCursor(18, 30);
+                arduboy.println(F("Better Luck Next"));
+                arduboy.setCursorX(35);
+                arduboy.print("Time Dude!");
+            }
+        }
     }
 
     void Score::printScore()

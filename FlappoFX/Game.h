@@ -67,12 +67,15 @@ class Game
 
         bool drawPlayerGameover;
 
+        uint16_t pipeDecreaseThreshold;
+
     public:
 
         void updateGame();
         void setup();
         void loop();
         void initialize();
+        void resetGame();
 
         void updateSplashscreen();  
         void updateTitlescreen();
