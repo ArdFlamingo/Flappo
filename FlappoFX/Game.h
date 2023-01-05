@@ -85,6 +85,10 @@ class Game
         void updateDeath();
         void updateGameover();
 
+        void updateOptions();
+        void updateHighscore();
+        void updateCredits();
+
         void generatePipe();
         bool collision();
 
@@ -95,5 +99,7 @@ class Game
         void drawPlayer();
         void drawGameover();
 
-        void printScore();
+        void drawOptions();
+        void drawHighscore();
+        void drawCredits();
 };

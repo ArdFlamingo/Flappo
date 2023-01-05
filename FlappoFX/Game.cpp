@@ -1,20 +1,28 @@
 #include <Arduboy2.h>
-#include <time.h>
+#include <ArduboyTones.h>
+#include <EEPROM.h>
+
 #include "Game.h"
 #include "Score.h"
 #include "Particles.h"
-#include "Sprites.h"
+#include "src/Sprites.h"
+#include "src/Tones.h"
+
+#define EEPROM_STORAGE_SPACE_START_ARDUBOY EEPROM_STORAGE_SPACE_START + 1200
+
+constexpr uint16_t initialized_eeprom = 1222;
 
 Arduboy2 arduboy;
 
 Score score;
-Score::Highscore highscore;
 
 Game::GameState gameState = Game::GameState::Splashscreen;
 Game::Player player;
 Game::Pipe pipe;
 
 Particles particles;
+
+ArduboyTones sound(arduboy.audio.enabled);
 
     constexpr uint8_t pipeGenerationFrames = 85;
     constexpr uint8_t firstOptionIndex = 0;
@@ -27,6 +35,13 @@ Particles particles;
         arduboy.begin();
         arduboy.initRandomSeed();
         initialize();
+        EEPROM.get(EEPROM_STORAGE_SPACE_START_ARDUBOY, score.gameHighscore);
+
+        if (score.isHighscoreInitialized != initialized_eeprom)
+        {
+            score.gameHighscore = 0;
+            score.isHighscoreInitialized = initialized_eeprom;
+        }
     } 
 
     void Game::initialize()
@@ -80,12 +95,18 @@ Particles particles;
                     break;
 
             case GameState::Highscore:
+                updateHighscore();
+                drawHighscore();
                     break;
 
             case GameState::Credits:
+                updateCredits();
+                drawCredits();
                     break;
 
             case GameState::Options:
+                updateOptions();
+                drawOptions();
                     break;
 
             case GameState::Preview:
@@ -138,6 +159,21 @@ Particles particles;
             gameState = GameState::Preview;
             resetGame();
         }
+
+        if (arduboy.justPressed(A_BUTTON) && cursorIndex == 1)
+        {
+            gameState = GameState::Options;
+        }
+
+        if (arduboy.justPressed(A_BUTTON) && cursorIndex == 2)
+        {
+            gameState = GameState::Highscore;
+        }
+
+        if (arduboy.justPressed(A_BUTTON) && cursorIndex == 3)
+        {
+            gameState = GameState::Credits;
+        }
     }
 
     void Game::updatePreview()
@@ -165,12 +201,16 @@ Particles particles;
             particles.playerX = player.x;
             particles.playerY = player.y;
             particles.resetParticles();
+            sound.tones(collisionTone);
         }
 
         for (auto & pipe : pipes)
         {
             if ((player.x - player.radius) == (pipe.x + pipe.width))
+            {
                 ++score.gameScore;
+                sound.tones(pointTone);
+            }
 
             if (score.gameScore == (pipeDecreaseThreshold + 5) && pipeGap > 14)
             {
@@ -244,11 +284,7 @@ Particles particles;
                 break;
                     
                 gameState = GameState::Gameover;
-        }
-
-        for (auto & highscore : highscore.highscoreList)
-        {
-            arduboy.println(highscore);
+                sound.tones(gameoverTone);
         }
     }
 
@@ -279,6 +315,43 @@ Particles particles;
     {
         if (arduboy.justPressed(A_BUTTON))
             gameState = GameState::Title;
+
+        EEPROM.put(EEPROM_STORAGE_SPACE_START_ARDUBOY, score.gameHighscore);
+    }
+
+    void Game::updateCredits()
+    {
+        if (arduboy.justPressed(B_BUTTON))
+        {
+            gameState = GameState::Title;
+        }
+    }
+
+    void Game::updateOptions()
+    {
+        if (arduboy.justPressed(B_BUTTON))
+        {
+            gameState = GameState::Title;
+        }
+
+        if (arduboy.justPressed(A_BUTTON))
+        {
+            arduboy.audio.toggle();
+        }
+
+        if (arduboy.justPressed(RIGHT_BUTTON))
+        {
+            score.gameHighscore = 0;
+            EEPROM.put(EEPROM_STORAGE_SPACE_START_ARDUBOY, score.gameHighscore);
+        }
+    }
+
+    void Game::updateHighscore()
+    {
+        if (arduboy.justPressed(B_BUTTON))
+        {
+            gameState = GameState::Title;
+        }
     }
 
     void Game::drawSplashscreen()
@@ -298,6 +371,7 @@ Particles particles;
         
         Sprites::drawSelfMasked(0, 32, background, 0);
 
+        arduboy.setTextSize(1);
         arduboy.setCursor(15, 0);
         arduboy.print(F("PRESS ANY BUTTON"));
     }
@@ -337,18 +411,63 @@ Particles particles;
 
         arduboy.setTextSize(1);
 
-        if (score.gameScore > highscore.highscoreList[0])
+        if (score.gameScore >= score.gameHighscore)
         {
             arduboy.setCursor(6, 30);
             arduboy.print(F("Spectacular Job Bro!"));
+            score.gameHighscore = score.gameScore;
         }
         else
         {
             arduboy.setCursor(18, 30);
             arduboy.println(F("Better Luck Next"));
             arduboy.setCursorX(35);
-            arduboy.print("Time Dude!");
+            arduboy.print(F("Time Dude!"));
         }
+    }
+
+    void Game::drawCredits()
+    {
+        Sprites::drawOverwrite(0, 0, credits, 0);
+    }
+
+    void Game::drawOptions()
+    {
+        if (arduboy.audio.enabled())
+        {
+            arduboy.setTextSize(1);
+            arduboy.setCursor(0, 0);
+            arduboy.println(F("Sound:On"));
+        }
+        else if (!arduboy.audio.enabled())
+        {
+            arduboy.setTextSize(1);
+            arduboy.setCursor(0, 0);
+            arduboy.println(F("Sound:Off"));
+        }
+
+        arduboy.print(F("RIGHT:Clear Highscore"));
+    }
+
+    void Game::drawHighscore()
+    {
+        Sprites::drawOverwrite(0, 0, highscoreTitle, 0);
+
+        if (score.gameHighscore > 999)
+            score.highscoreX = 40;
+
+        else if (score.gameHighscore > 99)
+            score.highscoreX = 46;
+
+        else if (score.gameHighscore > 9)
+            score.highscoreX = 52;
+
+        else
+            score.highscoreX = 58;
+
+        arduboy.setTextSize(2);
+        arduboy.setCursor(score.highscoreX, 35);
+        arduboy.print(score.gameHighscore);
     }
 
     void Score::printScore()
@@ -357,25 +476,5 @@ Particles particles;
         arduboy.setCursor(this->calculateScoreX(this->gameScore), 0);
         arduboy.print(this->gameScore);
     }  
-
-    void Score::updateHighscore()
-    {
-        if (score.gameScore > highscore.highscoreList[0])
-        {
-            highscore.highscoreList[0] = gameScore;
-        }
-        else if (score.gameScore > highscore.highscoreList[1])
-        {
-            highscore.highscoreList[1] = gameScore;
-        }
-        else if (score.gameScore > highscore.highscoreList[2])
-        {
-            highscore.highscoreList[2] = gameScore;
-        }
-        else if (score.gameScore > highscore.highscoreList[3])
-        {
-            highscore.highscoreList[3] = gameScore;
-        }
-    } 
 
 

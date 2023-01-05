@@ -7,8 +7,6 @@ void Score::loop()
     calculateScoreStringWidth(0);
     calculateCenterX(0);
     calculateScoreX(0);
-
-    updateHighscore();
 }
 
 uint8_t Score::countScoreDigits(uint16_t value)
@@ -47,4 +45,3 @@ uint8_t Score::calculateScoreX(uint8_t value)
 	
 	return x;
 }
-

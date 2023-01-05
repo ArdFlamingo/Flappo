@@ -6,6 +6,11 @@ class Score     //this code is a modified example from @pharap from this thread:
     public:
 
         uint16_t gameScore;
+        uint16_t gameHighscore;
+
+        uint16_t isHighscoreInitialized;
+
+        uint8_t highscoreX;
 
         uint8_t countScoreDigits(uint16_t value);
         uint8_t calculateScoreStringWidth(uint8_t length);
@@ -14,12 +19,4 @@ class Score     //this code is a modified example from @pharap from this thread:
 
         void printScore();
         void loop();
-        void updateHighscore();
-
-    public:
-
-        struct Highscore
-        {
-            uint16_t highscoreList[4];
-        };
 };
