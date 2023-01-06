@@ -10,8 +10,6 @@ class Score     //this code is a modified example from @pharap from this thread:
 
         uint16_t isHighscoreInitialized;
 
-        uint8_t highscoreX;
-
         uint8_t countScoreDigits(uint16_t value);
         uint8_t calculateScoreStringWidth(uint8_t length);
         uint8_t calculateCenterX(uint8_t width);

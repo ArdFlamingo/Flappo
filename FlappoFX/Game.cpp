@@ -452,20 +452,19 @@ ArduboyTones sound(arduboy.audio.enabled);
     {
         Sprites::drawOverwrite(0, 0, highscoreTitle, 0);
 
+        uint8_t highscoreX = 58;
+
         if (score.gameHighscore > 999)
-            score.highscoreX = 40;
+            highscoreX = 40;
 
         else if (score.gameHighscore > 99)
-            score.highscoreX = 46;
+            highscoreX = 46;
 
         else if (score.gameHighscore > 9)
-            score.highscoreX = 52;
-
-        else
-            score.highscoreX = 58;
+            highscoreX = 52;
 
         arduboy.setTextSize(2);
-        arduboy.setCursor(score.highscoreX, 35);
+        arduboy.setCursor(highscoreX, 35);
         arduboy.print(score.gameHighscore);
     }
 
