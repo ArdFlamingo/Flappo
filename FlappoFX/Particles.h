@@ -34,10 +34,7 @@ public:
 
     float gravity = 0.022;
 
-    float playerX;
-    float playerY;
-
-    void resetParticles();
+    void resetParticles(float playerX, float playerY);
     void updateParticles();
     void drawParticles();
 

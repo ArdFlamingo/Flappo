@@ -203,9 +203,7 @@ void Game::updateGameplay()
     {
         pipeSpeed = 0; backgroundSpeed = 0; 
         gameState = GameState::Death;
-        particles.playerX = player.x;
-        particles.playerY = player.y;
-        particles.resetParticles();
+        particles.resetParticles(player.x, player.y);
         sound.tones(collisionTone);
     }
 

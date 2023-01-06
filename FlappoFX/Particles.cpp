@@ -30,7 +30,7 @@ void Particles::drawParticles()
             Arduboy2::drawRect(particle.x, particle.y, particle.size, particle.size);
 }
 
-void Particles::resetParticles()
+void Particles::resetParticles(float playerX, float playerY)
 {
     for (auto & particle : particleArray)
     {
