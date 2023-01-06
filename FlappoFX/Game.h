@@ -7,6 +7,8 @@ class Game
 
         struct Player
         {
+            static constexpr uint8_t radius = 5;
+
             float x;
             float y;
 
@@ -15,8 +17,6 @@ class Game
             float gravity;
 
             float jumpVelocity;
-
-            uint8_t radius = 5;
         };
 
         struct Pipe
