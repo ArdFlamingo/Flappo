@@ -61,8 +61,6 @@ ArduboyTones sound(arduboy.audio.enabled);
 
         pipeGap = 25;
 
-        drawPlayerGameover = true;
-
         for (auto & pipe : pipes) {pipe.x = -14; pipe.width = 14;}
     }
 
@@ -281,6 +279,7 @@ ArduboyTones sound(arduboy.audio.enabled);
 
             gameState = GameState::Gameover;
             sound.tones(gameoverTone);
+            drawPlayerGameover = true;
         }
     }
 
@@ -309,8 +308,6 @@ ArduboyTones sound(arduboy.audio.enabled);
         pipeSpeed = 1;
 
         pipeGap = 25;
-
-        drawPlayerGameover = true;
 
         for (auto & pipe : pipes) {pipe.x = -14; pipe.width = 14; pipe.active = false;}
 
