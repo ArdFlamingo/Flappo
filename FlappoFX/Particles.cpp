@@ -3,7 +3,6 @@
 
 Game::Player gamePlayer;
 
-
 void Particles::updateParticles()
 {
     for (auto & particle : particleArray)
@@ -20,7 +19,7 @@ void Particles::updateParticles()
         particle.y += particle.yVelocity;
 
         if (particle.isActive())
-            particle.counter--;
+            --particle.counter;
     }
 }
 
