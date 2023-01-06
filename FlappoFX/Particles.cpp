@@ -19,7 +19,7 @@ void Particles::updateParticles()
         particles.x += particles.xVelocity;
         particles.y += particles.yVelocity;
 
-        if (particles.counter > 0)
+        if (particles.isActive())
         {
             particles.counter--;
             Arduboy2::drawRect(particles.x, particles.y, particles.size, particles.size);

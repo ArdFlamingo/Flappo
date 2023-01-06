@@ -277,7 +277,7 @@ ArduboyTones sound(arduboy.audio.enabled);
 
         for (auto & particles : particles.particleArray)
         {
-            if (particles.counter > 0)
+            if (particles.isActive())
                 break;
                     
                 gameState = GameState::Gameover;
