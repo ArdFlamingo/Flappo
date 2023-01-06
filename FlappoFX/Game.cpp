@@ -76,7 +76,6 @@ ArduboyTones sound(arduboy.audio.enabled);
         arduboy.pollButtons();
         arduboy.clear();
         updateGame();
-        score.loop();
         arduboy.display();
     }
 

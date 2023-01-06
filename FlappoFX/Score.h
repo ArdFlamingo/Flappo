@@ -18,5 +18,4 @@ class Score     //this code is a modified example from @pharap from this thread:
         uint8_t calculateScoreX(uint8_t value);
 
         void printScore();
-        void loop();
 };
