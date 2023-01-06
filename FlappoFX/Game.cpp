@@ -418,7 +418,7 @@ void Game::drawGame()
         arduboy.fillRect(pipe.x, pipe.bottomPipeY, pipe.width, pipe.bottomPipeHeight);
     }
 
-    score.printScore();
+    this->printScore();
 }
 
 void Game::drawPlayer()
@@ -492,9 +492,9 @@ void Game::drawHighscore()
     arduboy.print(score.gameHighscore);
 }
 
-void Score::printScore()
+void Game::printScore()
 {
     arduboy.setTextSize(1);
-    arduboy.setCursor(this->calculateScoreX(this->gameScore), 0);
-    arduboy.print(this->gameScore);
+    arduboy.setCursor(score.calculateScoreX(score.gameScore), 0);
+    arduboy.print(score.gameScore);
 }

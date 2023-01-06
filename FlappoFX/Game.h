@@ -103,4 +103,6 @@ public:
     void drawOptions();
     void drawHighscore();
     void drawCredits();
+
+    void printScore();
 };
