@@ -189,9 +189,6 @@ void Game::updatePreview()
 
 void Game::updateGameplay()
 {
-    player.yVelocity += player.gravity;
-    player.y += player.yVelocity;
-
     if (arduboy.justPressed(UP_BUTTON) || arduboy.justPressed(DOWN_BUTTON) || arduboy.justPressed(LEFT_BUTTON) || arduboy.justPressed(RIGHT_BUTTON) || arduboy.justPressed (A_BUTTON) || arduboy.justPressed(B_BUTTON))
     {
         player.yVelocity = 0; 
@@ -199,11 +196,12 @@ void Game::updateGameplay()
     }
 
     if ((player.y - player.radius) <= 0)
-    {
         player.yVelocity = 0;
-    }
 
-    if (collision()) 
+    player.yVelocity += player.gravity;
+    player.y += player.yVelocity;
+
+    if (collision())
     {
         pipeSpeed = 0; backgroundSpeed = 0; 
         gameState = GameState::Death;
