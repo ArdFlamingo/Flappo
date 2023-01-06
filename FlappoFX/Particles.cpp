@@ -3,41 +3,44 @@
 
 Game::Player gamePlayer;
 
-
 void Particles::updateParticles()
 {
-    for (auto & particles : particleArray)
+    for (auto & particle : particleArray)
     {
-        particles.yVelocity += this->gravity * particles.size;
+        particle.yVelocity += this->gravity * particle.size;
         
-        particles.yVelocity -= particles.yForce / (particles.size * 0.5);
-        particles.xVelocity += particles.xForce / (particles.size * 0.15);
+        particle.yVelocity -= particle.yForce / (particle.size * 0.5);
+        particle.xVelocity += particle.xForce / (particle.size * 0.15);
 
-        particles.xForce *= 0.95;
-        particles.yForce *= 0.95;
+        particle.xForce *= 0.95;
+        particle.yForce *= 0.95;
 
-        particles.x += particles.xVelocity;
-        particles.y += particles.yVelocity;
+        particle.x += particle.xVelocity;
+        particle.y += particle.yVelocity;
 
-        if (particles.counter > 0)
-        {
-            particles.counter--;
-            Arduboy2::drawRect(particles.x, particles.y, particles.size, particles.size);
-        }
+        if (particle.isActive())
+            --particle.counter;
     }
 }
 
-void Particles::resetParticles()
+void Particles::drawParticles()
 {
-    for (auto & particles : particleArray)
+    for (auto & particle : this->particleArray)
+        if (particle.isActive())
+            Arduboy2::drawRect(particle.x, particle.y, particle.size, particle.size);
+}
+
+void Particles::resetParticles(float playerX, float playerY)
+{
+    for (auto & particle : particleArray)
     {
-        particles.size = random(2, 7);
-        particles.counter = random(85, 100);
+        particle.size = random(2, 7);
+        particle.counter = random(85, 100);
 
-        particles.x = random(playerX - 5, playerX + 5 + 1);
-        particles.y = random(playerY - 5, playerY + 5 + 1);
+        particle.x = random(playerX - 5, playerX + 5 + 1);
+        particle.y = random(playerY - 5, playerY + 5 + 1);
 
-        particles.xForce = random(-5, 6) / 100.0;
-        particles.yForce = random(25, 50) / 100.0;
+        particle.xForce = random(-5, 6) / 100.0;
+        particle.yForce = random(25, 50) / 100.0;
     }
 }

@@ -3,40 +3,42 @@
 #include <stdint.h>
 #include "Game.h"
 
-
 class Particles
 {
+public:
+
+    struct Particle
+    {
     public:
 
-        struct Particle
+        float x;
+        float y;
+
+        float xVelocity;
+        float yVelocity;
+
+        float xForce;
+        float yForce;
+
+        uint8_t size = 1;
+
+        uint8_t counter = 180;
+
+        bool isActive() const
         {
-            public:
+            return (this->counter > 0);
+        }
+    };
 
-                float x;
-                float y;
+public:
 
-                float xVelocity;
-                float yVelocity;
+    float gravity = 0.022;
 
-                float xForce;
-                float yForce;
+    void resetParticles(float playerX, float playerY);
+    void updateParticles();
+    void drawParticles();
 
-                uint8_t size = 1;
+public:
 
-                uint8_t counter = 180;
-        };
-
-    public:
-
-        float gravity = 0.022;
-
-        float playerX;
-        float playerY;
-
-        void resetParticles();
-        void updateParticles();
-
-    public:
-
-        Particle particleArray[40];
+    Particle particleArray[40];
 };
