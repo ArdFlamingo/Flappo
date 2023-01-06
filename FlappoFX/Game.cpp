@@ -183,7 +183,8 @@ void Game::updateTitlescreen()
 
 void Game::updatePreview()
 {
-    if (arduboy.justPressed(UP_BUTTON) || arduboy.justPressed(DOWN_BUTTON) || arduboy.justPressed(LEFT_BUTTON) || arduboy.justPressed(RIGHT_BUTTON) || arduboy.justPressed (A_BUTTON) || arduboy.justPressed(B_BUTTON)) {gameState = GameState::Game;}
+    if (arduboy.justPressed(UP_BUTTON) || arduboy.justPressed(DOWN_BUTTON) || arduboy.justPressed(LEFT_BUTTON) || arduboy.justPressed(RIGHT_BUTTON) || arduboy.justPressed (A_BUTTON) || arduboy.justPressed(B_BUTTON))
+        gameState = GameState::Game;
 }
 
 void Game::updateGameplay()
@@ -191,13 +192,16 @@ void Game::updateGameplay()
     player.yVelocity += player.gravity;
     player.y += player.yVelocity;
 
-    if (arduboy.justPressed(UP_BUTTON) || arduboy.justPressed(DOWN_BUTTON) || arduboy.justPressed(LEFT_BUTTON) || arduboy.justPressed(RIGHT_BUTTON) || arduboy.justPressed (A_BUTTON) || arduboy.justPressed(B_BUTTON)) 
+    if (arduboy.justPressed(UP_BUTTON) || arduboy.justPressed(DOWN_BUTTON) || arduboy.justPressed(LEFT_BUTTON) || arduboy.justPressed(RIGHT_BUTTON) || arduboy.justPressed (A_BUTTON) || arduboy.justPressed(B_BUTTON))
     {
         player.yVelocity = 0; 
         player.yVelocity -= player.jumpVelocity;
     }
 
-    if ((player.y - player.radius) <= 0) {player.yVelocity = 0;}
+    if ((player.y - player.radius) <= 0)
+    {
+        player.yVelocity = 0;
+    }
 
     if (collision()) 
     {
