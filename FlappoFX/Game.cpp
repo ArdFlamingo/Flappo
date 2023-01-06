@@ -272,9 +272,9 @@ ArduboyTones sound(arduboy.audio.enabled);
             particles.updateParticles();
         }
 
-        for (auto & particles : particles.particleArray)
+        for (auto & particle : particles.particleArray)
         {
-            if (particles.isActive())
+            if (particle.isActive())
                 break;
 
             gameState = GameState::Gameover;
@@ -313,7 +313,7 @@ ArduboyTones sound(arduboy.audio.enabled);
 
         score.gameScore = 0;
 
-        for (auto & particles : particles.particleArray) {particles.xVelocity = 0; particles.yVelocity = 0;}
+        for (auto & particle : particles.particleArray) {particle.xVelocity = 0; particle.yVelocity = 0;}
     }
 
     void Game::updateGameover()
