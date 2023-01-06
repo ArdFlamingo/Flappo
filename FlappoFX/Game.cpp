@@ -256,14 +256,21 @@ void Game::generatePipe()
 
 bool Game::collision()
 {
-    Rect playerHitbox (player.x, player.y, player.radius, player.radius);
+    Rect playerHitbox { player.x, player.y, player.radius, player.radius };
     
     for (auto & pipe : pipes)
     {
-        Rect topPipeHitbox (pipe.x, pipe.topPipeY, pipe.width, pipe.topPipeHeight);
-        Rect bottomPipeHitbox (pipe.x, pipe.bottomPipeY, pipe.width, pipe.bottomPipeHeight);
+        Rect topPipeHitbox { pipe.x, pipe.topPipeY, pipe.width, pipe.topPipeHeight };
 
-        if (arduboy.collide(playerHitbox, topPipeHitbox) || arduboy.collide(playerHitbox, bottomPipeHitbox) || (player.y + player.radius) >= 63)
+        if (arduboy.collide(playerHitbox, topPipeHitbox))
+            return true;
+
+        Rect bottomPipeHitbox { pipe.x, pipe.bottomPipeY, pipe.width, pipe.bottomPipeHeight };
+
+        if (arduboy.collide(playerHitbox, bottomPipeHitbox))
+            return true;
+
+        if ((player.y + player.radius) >= arduboy.height())
             return true;
     }
 
