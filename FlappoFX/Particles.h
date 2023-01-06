@@ -40,6 +40,7 @@ class Particles
 
         void resetParticles();
         void updateParticles();
+        void drawParticles();
 
     public:
 

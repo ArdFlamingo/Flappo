@@ -273,6 +273,7 @@ ArduboyTones sound(arduboy.audio.enabled);
         else
         {   
             particles.updateParticles();
+            particles.drawParticles();
         }
 
         for (auto & particles : particles.particleArray)

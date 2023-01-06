@@ -20,11 +20,15 @@ void Particles::updateParticles()
         particles.y += particles.yVelocity;
 
         if (particles.isActive())
-        {
             particles.counter--;
-            Arduboy2::drawRect(particles.x, particles.y, particles.size, particles.size);
-        }
     }
+}
+
+void Particles::drawParticles()
+{
+    for (auto & particles : this->particleArray)
+        if (particles.isActive())
+            Arduboy2::drawRect(particles.x, particles.y, particles.size, particles.size);
 }
 
 void Particles::resetParticles()
