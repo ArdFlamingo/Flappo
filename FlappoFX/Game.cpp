@@ -55,8 +55,6 @@ ArduboyTones sound(arduboy.audio.enabled);
 
         backgroundSpeed = 0.1;
 
-        player.gravity = 0.05;
-
         player.jumpVelocity = 1.2;
 
         pipeSpeed = 1;

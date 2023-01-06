@@ -9,12 +9,12 @@ class Game
         {
             static constexpr uint8_t radius = 5;
 
+            static constexpr float gravity = 0.05;
+
             float x;
             float y;
 
             float yVelocity;
-
-            float gravity;
 
             float jumpVelocity;
         };
