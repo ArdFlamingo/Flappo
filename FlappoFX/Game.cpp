@@ -159,26 +159,26 @@ void Game::updateTitlescreen()
     cursorX = options[cursorIndex].x;
     cursorY = options[cursorIndex].y;
 
-    if (arduboy.justPressed(A_BUTTON) && cursorIndex == 0) 
-    {
-        gameState = GameState::Preview;
-        resetGame();
-    }
+    if(arduboy.justPressed(A_BUTTON))
+        switch(cursorIndex)
+        {
+            case 0:
+                resetGame();
+                gameState = GameState::Preview;
+                break;
 
-    if (arduboy.justPressed(A_BUTTON) && cursorIndex == 1)
-    {
-        gameState = GameState::Options;
-    }
+            case 1:
+                gameState = GameState::Options;
+                break;
 
-    if (arduboy.justPressed(A_BUTTON) && cursorIndex == 2)
-    {
-        gameState = GameState::Highscore;
-    }
+            case 2:
+                gameState = GameState::Highscore;
+                break;
 
-    if (arduboy.justPressed(A_BUTTON) && cursorIndex == 3)
-    {
-        gameState = GameState::Credits;
-    }
+            case 3:
+                gameState = GameState::Credits;
+                break;
+        }
 }
 
 void Game::updatePreview()
