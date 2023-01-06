@@ -96,6 +96,7 @@ class Game
         void drawTitlescreen();
         void drawPreview();
         void drawGame();
+        void drawDeath();
         void drawPlayer();
         void drawGameover();
 

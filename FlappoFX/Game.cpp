@@ -119,6 +119,7 @@ ArduboyTones sound(arduboy.audio.enabled);
 
             case GameState::Death:
                 updateDeath();
+                drawDeath();
                     break;
 
             case GameState::Gameover:
@@ -267,22 +268,31 @@ ArduboyTones sound(arduboy.audio.enabled);
             {
                 drawPlayerGameover = false;
             }
-
-            drawPlayer();
         }
         else
         {   
             particles.updateParticles();
-            particles.drawParticles();
         }
 
         for (auto & particles : particles.particleArray)
         {
             if (particles.isActive())
                 break;
-                    
-                gameState = GameState::Gameover;
-                sound.tones(gameoverTone);
+
+            gameState = GameState::Gameover;
+            sound.tones(gameoverTone);
+        }
+    }
+
+    void Game::drawDeath()
+    {
+        if (drawPlayerGameover)
+        {
+            drawPlayer();
+        }
+        else
+        {
+            particles.drawParticles();
         }
     }
 
