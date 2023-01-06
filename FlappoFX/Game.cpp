@@ -242,7 +242,7 @@ void Game::generatePipe()
             if (pipe.active)
                 continue;
 
-            pipe.x = WIDTH;
+            pipe.x = arduboy.width();
             pipe.active = true;
             pipe.topPipeHeight = random(6, 29);
 
@@ -250,7 +250,7 @@ void Game::generatePipe()
         }
 
         pipe.bottomPipeY = (pipe.topPipeHeight + pipeGap);
-        pipe.bottomPipeHeight = (WIDTH - pipe.bottomPipeY);
+        pipe.bottomPipeHeight = (arduboy.width() - pipe.bottomPipeY);
     }    
 }
 
