@@ -24,6 +24,11 @@ class Particles
                 uint8_t size = 1;
 
                 uint8_t counter = 180;
+
+                bool isActive() const
+                {
+                    return (this->counter > 0);
+                }
         };
 
     public:
