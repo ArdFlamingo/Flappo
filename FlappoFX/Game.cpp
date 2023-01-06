@@ -438,7 +438,7 @@ ArduboyTones sound(arduboy.audio.enabled);
             arduboy.setCursor(0, 0);
             arduboy.println(F("Sound:On"));
         }
-        else if (!arduboy.audio.enabled())
+        else
         {
             arduboy.setTextSize(1);
             arduboy.setCursor(0, 0);
