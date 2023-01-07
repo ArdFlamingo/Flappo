@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include <FixedPointsCommon.h>
 
 class Game
 {

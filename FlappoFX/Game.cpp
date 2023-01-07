@@ -42,11 +42,13 @@ void Game::setup()
     arduboy.initRandomSeed();
     initialize();
     EEPROM.get(EEPROM_STORAGE_SPACE_START_ARDUBOY, score.gameHighscore);
+    EEPROM.get(EEPROM_STORAGE_SPACE_START_ARDUBOY + 5, score.isHighscoreInitialized);
 
     if (score.isHighscoreInitialized != initialized_eeprom)
     {
         score.gameHighscore = 0;
         score.isHighscoreInitialized = initialized_eeprom;
+        EEPROM.put(EEPROM_STORAGE_SPACE_START_ARDUBOY + 5, score.isHighscoreInitialized);
     }
 } 
 
