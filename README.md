@@ -1,5 +1,9 @@
 # Flappo-FX
 
+Version 1.1 now available, with fixed EEPROM saving!
+
+---
+
 Flappo FX is a modern Flappy Bird clone for the Arduboy FX (with particles!). The aim of the game is to fly Flappo through the pipes, and to not crash! The pipes' gaps increasingly shrink and increasingly become more difficult to fly through.
 
 ---
